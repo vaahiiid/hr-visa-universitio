@@ -4,69 +4,48 @@
 
 @layer base {
   :root {
-    --background: 224 71.4% 4.1%; /* Dark Blue-Gray */
-    --foreground: 210 20% 98%; /* Almost White */
-
-    --card: 222 47% 11%; /* Slightly Lighter Dark Blue */
-    --card-foreground: 210 20% 98%;
-
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 346.8 77.2% 49.8%; /* Universitio Pink/Red */
-    --primary-foreground: 210 20% 98%;
-
-    --secondary: 215 27.9% 16.9%; /* Darker Blue-Gray for secondary elements */
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 215 20.2% 34.1%; /* Muted Blue-Gray */
-    --muted-foreground: 215.4 16.3% 56.9%; /* Lighter Muted Blue-Gray for text */
-
-    --accent: 215 27.9% 16.9%; /* Can be same as secondary or slightly different */
-    --accent-foreground: 210 20% 98%;
-
-    --destructive: 0 62.8% 30.6%; /* Dark Red */
-    --destructive-foreground: 210 20% 98%;
-    
-    --success: 142.1 70.6% 45.3%; /* Green */
-    --success-foreground: 210 20% 98%;
-
-    --warning: 47.9 95.8% 53.1%; /* Amber/Yellow */
-    --warning-foreground: 210 20% 98%;
-
-
-    --border: 215 27.9% 16.9%; /* Border color matching secondary or card outline */
-    --input: 215 27.9% 16.9%; /* Input field background */
-    --ring: 346.8 77.2% 49.8%; /* Ring color for focus states, matching primary */
-
-    --radius: 0.75rem; /* Slightly larger radius for a modern feel */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    /* Keep the same as :root for a consistent dark theme */
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 346.8 77.2% 49.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 20.2% 34.1%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 72.2% 50.6%; /* Adjusted destructive for dark */
-    --destructive-foreground: 210 20% 98%;
-    --success: 142.1 70.6% 35.3%; /* Darker Green for success */
-    --success-foreground: 210 20% 98%;
-    --warning: 47.9 95.8% 43.1%; /* Darker Yellow for warning */
-    --warning-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 346.8 77.2% 49.8%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
   }
 }
 
@@ -76,7 +55,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
   }
 }
 
@@ -85,44 +63,45 @@
 
 
 .grid-pattern {
-  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(103, 58, 183, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(103, 58, 183, 0.05) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 .page-header {
-  background: linear-gradient(135deg, hsl(var(--primary) / 0.8), hsl(var(--primary) / 0.6) 70%, hsl(var(--secondary) / 0.7));
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8) 70%, hsl(var(--secondary)));
   color: hsl(var(--primary-foreground));
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2), 0 6px 6px rgba(0,0,0,0.15);
-  border-bottom: 2px solid hsl(var(--primary) / 0.5);
+  box-shadow: 0 10px 20px rgba(103, 58, 183, 0.1), 0 6px 6px rgba(103, 58, 183, 0.08);
+  border-bottom: 2px solid hsl(var(--primary) / 0.3);
 }
 
 .page-header h1 {
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 3px rgba(103, 58, 183, 0.2);
 }
 
 .employee-card {
-  @apply bg-card/80 backdrop-blur-sm border-border transition-all duration-300 ease-in-out;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1);
+  @apply bg-card border-border transition-all duration-300 ease-in-out;
+  box-shadow: 0 8px 16px rgba(103, 58, 183, 0.08), 0 3px 6px rgba(103, 58, 183, 0.05);
 }
 
 .employee-card:hover {
   @apply shadow-xl scale-[1.02];
-  border-color: hsl(var(--primary) / 0.5);
+  border-color: hsl(var(--primary) / 0.3);
 }
 
 .password-screen {
-  @apply min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800;
+  @apply min-h-screen flex items-center justify-center p-4;
+  background: linear-gradient(135deg, rgba(103, 58, 183, 0.05), rgba(103, 58, 183, 0.02));
   background-image: 
-    radial-gradient(circle at 10% 20%, hsla(var(--primary)/0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, hsla(var(--secondary)/0.1) 0%, transparent 50%);
+    radial-gradient(circle at 10% 20%, hsla(var(--primary)/0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, hsla(var(--secondary)/0.05) 0%, transparent 50%);
 }
 
 .password-card {
-  @apply bg-card/90 backdrop-blur-lg shadow-2xl rounded-xl w-full max-w-md p-6 md:p-10 border border-border/50;
+  @apply bg-card shadow-2xl rounded-xl w-full max-w-md p-6 md:p-10 border border-border;
 }
 
 .logo-container-login {
-  @apply mb-6 p-3 bg-primary/10 rounded-full inline-block shadow-lg;
+  @apply mb-6 p-3 bg-primary/5 rounded-full inline-block shadow-lg;
 }
 
 .password-input {
@@ -131,20 +110,20 @@
 
 .login-button {
   @apply w-full bg-primary hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105;
-  text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.1);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--background) / 0.5);
+  background: hsl(var(--background));
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
+  background: hsl(var(--primary) / 0.2);
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
+  background: hsl(var(--primary) / 0.3);
 }

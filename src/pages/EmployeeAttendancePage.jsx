@@ -6,25 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, User, Power, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
-import LoginForm from '@/components/LoginForm'; 
 import AttendanceStatus from '@/components/attendance/AttendanceStatus';
 import AttendanceControls from '@/components/attendance/AttendanceControls';
 import AttendanceHistoryList from '@/components/attendance/AttendanceHistoryList';
+import LeaveManagement from '@/components/attendance/LeaveManagement';
 import { useEmployeeAttendance } from '@/hooks/useEmployeeAttendance';
-
-const EMPLOYEE_ATTENDANCE_SESSION_KEY_PREFIX = "employeeAttendanceLoggedIn_";
 
 const EmployeeAttendancePage = ({ onLogout }) => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const {
     employee,
     attendanceRecords,
     currentStatus,
-    loading,
+    loading: attendanceLoading,
     actionLoading,
     fetchEmployeeDetails,
     fetchAttendanceRecords,
@@ -34,47 +32,51 @@ const EmployeeAttendancePage = ({ onLogout }) => {
   } = useEmployeeAttendance(employeeId);
 
   useEffect(() => {
-    const sessionKey = `${EMPLOYEE_ATTENDANCE_SESSION_KEY_PREFIX}${employeeId}`;
-    const sessionLoggedIn = sessionStorage.getItem(sessionKey) === `true`;
-    if (sessionLoggedIn) {
-      setLoggedIn(true);
-    }
-  }, [employeeId]);
-  
-  useEffect(() => {
-    if (!loggedIn || !employeeId) return;
-
-    const loadData = async () => {
-      const empDetails = await fetchEmployeeDetails();
-      if (empDetails) {
-        const attRecords = await fetchAttendanceRecords();
-        determineCurrentStatus(attRecords);
-      } else {
-        toast({ title: 'Access Denied', description: 'Could not load employee data.', variant: 'destructive' });
-        navigate("/login"); 
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+        return;
       }
+
+      const loadData = async () => {
+        const empDetails = await fetchEmployeeDetails();
+        if (empDetails) {
+          const attRecords = await fetchAttendanceRecords();
+          determineCurrentStatus(attRecords);
+        } else {
+          toast({ 
+            title: 'Access Denied', 
+            description: 'Could not load employee data.', 
+            variant: 'destructive' 
+          });
+          navigate("/login");
+        }
+      };
+      
+      await loadData();
+      setLoading(false);
     };
-    loadData();
-  }, [loggedIn, employeeId, fetchEmployeeDetails, fetchAttendanceRecords, determineCurrentStatus, navigate, toast]);
 
-  const handleEmployeeLogin = () => {
-    setLoggedIn(true);
-    const sessionKey = `${EMPLOYEE_ATTENDANCE_SESSION_KEY_PREFIX}${employeeId}`;
-    sessionStorage.setItem(sessionKey, `true`);
+    checkSession();
+  }, [employeeId, fetchEmployeeDetails, fetchAttendanceRecords, determineCurrentStatus, navigate, toast]);
+
+  const handleLogoutClick = async () => {
+    try {
+      await supabase.auth.signOut();
+      if (onLogout) onLogout();
+      else navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to log out. Please try again.',
+        variant: 'destructive'
+      });
+    }
   };
-  
-  const handleLogoutClick = () => {
-    const sessionKey = `${EMPLOYEE_ATTENDANCE_SESSION_KEY_PREFIX}${employeeId}`;
-    sessionStorage.removeItem(sessionKey);
-    if (onLogout) onLogout(); 
-    else navigate('/login'); 
-  };
 
-  if (!loggedIn) {
-    return <LoginForm onLogin={handleEmployeeLogin} isEmployeeLogin={true} />;
-  }
-
-  if (loading) {
+  if (loading || attendanceLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-white p-4">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -94,31 +96,38 @@ const EmployeeAttendancePage = ({ onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white p-4 md:p-8 flex flex-col items-center">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 flex flex-col items-center">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-4xl"
+        className="w-full max-w-4xl space-y-6"
       >
-        <Card className="bg-slate-800/70 backdrop-blur-md border-slate-700 shadow-2xl">
-          <CardHeader className="text-center border-b border-slate-700 pb-6">
-            <motion.img 
-              src="https://storage.googleapis.com/hostinger-horizons-assets-prod/3fc2bcbf-9ff5-4dd1-b724-ac34eb3d196e/2a0983f9ffbd6d222994de9f3e4c1c9f.png" 
-              alt="Universitio Logo" 
-              className="h-16 w-auto mx-auto mb-4"
+        <Card className="bg-card border-border shadow-2xl">
+          <CardHeader className="text-center border-b border-border/30 pb-6">
+            <motion.div
+              className="bg-primary/5 p-4 rounded-full inline-block mx-auto mb-4"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring" }}
-            />
+            >
+              <img 
+                src="https://storage.googleapis.com/hostinger-horizons-assets-prod/3fc2bcbf-9ff5-4dd1-b724-ac34eb3d196e/2a0983f9ffbd6d222994de9f3e4c1c9f.png" 
+                alt="Universitio Logo" 
+                className="h-16 w-auto"
+              />
+            </motion.div>
             <CardTitle className="text-3xl font-bold text-primary flex items-center justify-center">
               <User className="mr-3 h-8 w-8" /> {employee.name}
             </CardTitle>
-            <CardDescription className="text-slate-400 flex items-center justify-center mt-1">
+            <CardDescription className="text-muted-foreground flex items-center justify-center mt-1">
               <Briefcase className="mr-2 h-4 w-4" /> {employee.position}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6 space-y-8">
-            <AttendanceStatus currentStatus={currentStatus.status} />
+            <AttendanceStatus 
+              currentStatus={currentStatus.status} 
+              clockInTime={currentStatus.clockInTime}
+            />
             <AttendanceControls
               onClockIn={handleClockIn}
               onClockOut={handleClockOut}
@@ -127,13 +136,26 @@ const EmployeeAttendancePage = ({ onLogout }) => {
             />
             <AttendanceHistoryList attendanceRecords={attendanceRecords} />
           </CardContent>
-          <CardFooter className="border-t border-slate-700 pt-6 flex justify-between items-center">
-             <p className="text-xs text-slate-500">Employee Portal &copy; {new Date().getFullYear()} Universitio</p>
-            <Button variant="ghost" onClick={handleLogoutClick} className="text-slate-400 hover:text-red-400 hover:bg-red-500/10">
+          <CardFooter className="border-t border-border/30 pt-6 flex justify-between items-center">
+            <p className="text-xs text-muted-foreground">Employee Portal &copy; {new Date().getFullYear()} Universitio</p>
+            <Button 
+              variant="outline" 
+              onClick={handleLogoutClick} 
+              className="text-primary hover:bg-primary/5 hover:text-primary/90"
+            >
               <Power className="mr-2 h-4 w-4" /> Logout
             </Button>
           </CardFooter>
         </Card>
+
+        {/* Leave Management Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <LeaveManagement employee={employee} />
+        </motion.div>
       </motion.div>
     </div>
   );

@@ -48,82 +48,56 @@ const EmployeeList = ({ employees }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 p-4 bg-card rounded-lg shadow">
-        <div className="relative flex-grow">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, position, department, nationality..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+          <Users className="h-6 w-6 text-primary" />
+          Employee Directory
+        </h2>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:min-w-[300px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search employees..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 w-full"
+            />
+          </div>
           <Button
             variant={filterStatus === "all" ? "default" : "outline"}
             onClick={() => setFilterStatus("all")}
-            className="flex items-center gap-1"
+            className="whitespace-nowrap"
           >
-            <Users className="h-4 w-4" />
             All
           </Button>
           <Button
             variant={filterStatus === "critical" ? "destructive" : "outline"}
             onClick={() => setFilterStatus("critical")}
-            className="flex items-center gap-1"
+            className="whitespace-nowrap"
           >
-            <AlertTriangle className="h-4 w-4" />
+            <AlertTriangle className="h-4 w-4 mr-1" />
             Critical
-          </Button>
-          <Button
-            variant={filterStatus === "warning" ? "secondary" : "outline"}
-            onClick={() => setFilterStatus("warning")}
-            className="flex items-center gap-1 text-amber-600 border-amber-500 hover:bg-amber-100"
-          >
-            <ShieldAlert className="h-4 w-4" />
-            Warning
-          </Button>
-          <Button
-            variant={filterStatus === "valid" ? "secondary" : "outline"}
-            onClick={() => setFilterStatus("valid")}
-            className="flex items-center gap-1 text-green-600 border-green-500 hover:bg-green-100"
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            Valid
-          </Button>
-           <Button
-            variant={filterStatus === "expired" ? "destructive" : "outline"}
-            onClick={() => setFilterStatus("expired")}
-            className="flex items-center gap-1"
-          >
-            <Filter className="h-4 w-4" />
-            Expired
           </Button>
         </div>
       </div>
 
-      {filteredEmployees.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-10"
-        >
-          <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-4 text-xl font-semibold text-foreground">No Employees Found</p>
-          <p className="text-muted-foreground">Try adjusting your search or filter criteria.</p>
-        </motion.div>
-      ) : (
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-        >
-          {filteredEmployees.map((employee) => (
-            <EmployeeCard key={employee.id} employee={employee} />
-          ))}
-        </motion.div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredEmployees.map((employee) => (
+          <motion.div
+            key={employee.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <EmployeeCard employee={employee} />
+          </motion.div>
+        ))}
+        {filteredEmployees.length === 0 && (
+          <div className="col-span-2 text-center py-8 text-muted-foreground">
+            No employees found matching your search criteria.
+          </div>
+        )}
+      </div>
     </div>
   );
 };

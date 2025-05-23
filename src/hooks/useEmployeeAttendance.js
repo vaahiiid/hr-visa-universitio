@@ -7,7 +7,7 @@ export const useEmployeeAttendance = (employeeId) => {
   const { toast } = useToast();
   const [employee, setEmployee] = useState(null);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
-  const [currentStatus, setCurrentStatus] = useState({ status: 'Clocked Out', recordId: null });
+  const [currentStatus, setCurrentStatus] = useState({ status: 'Clocked Out', recordId: null, clockInTime: null });
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -15,7 +15,7 @@ export const useEmployeeAttendance = (employeeId) => {
     setLoading(true);
     const { data, error } = await supabase
       .from('employees')
-      .select('id, name, position')
+      .select('id, name, position, email')
       .eq('id', employeeId)
       .single();
     setLoading(false);
@@ -46,23 +46,31 @@ export const useEmployeeAttendance = (employeeId) => {
 
   const determineCurrentStatus = useCallback((records) => {
     const today = format(new Date(), 'yyyy-MM-dd');
-    const todayRecord = records.find(
-      (r) => format(parseISO(r.attendance_date), 'yyyy-MM-dd') === today && r.status !== 'Annual Leave' && r.status !== 'Sick Leave'
+    const todayRecords = records.filter(
+      (r) => format(parseISO(r.attendance_date), 'yyyy-MM-dd') === today
     );
 
-    if (todayRecord) {
-      if (todayRecord.clock_in_time && !todayRecord.clock_out_time) {
-        setCurrentStatus({ status: 'Clocked In', recordId: todayRecord.id });
+    if (todayRecords.length > 0) {
+      const lastRecord = todayRecords[0];
+      if (!lastRecord.clock_out_time) {
+        setCurrentStatus({ 
+          status: 'Clocked In', 
+          recordId: lastRecord.id,
+          clockInTime: lastRecord.clock_in_time
+        });
       } else {
-        setCurrentStatus({ status: 'Clocked Out', recordId: null });
+        setCurrentStatus({ 
+          status: 'Clocked Out', 
+          recordId: null,
+          clockInTime: null
+        });
       }
     } else {
-       const onLeaveToday = records.find(r => format(parseISO(r.attendance_date), 'yyyy-MM-dd') === today && (r.status === 'Annual Leave' || r.status === 'Sick Leave'));
-        if (onLeaveToday) {
-            setCurrentStatus({ status: onLeaveToday.status, recordId: onLeaveToday.id });
-        } else {
-            setCurrentStatus({ status: 'Clocked Out', recordId: null });
-        }
+      setCurrentStatus({ 
+        status: 'Clocked Out', 
+        recordId: null,
+        clockInTime: null
+      });
     }
   }, []);
 
@@ -71,45 +79,71 @@ export const useEmployeeAttendance = (employeeId) => {
     setActionLoading(true);
     const now = new Date();
     const today = format(now, 'yyyy-MM-dd');
+    const timestamp = now.getTime();
 
+    // Create a new attendance record with a unique status
     const { data, error } = await supabase
       .from('employee_attendance')
       .insert({
         employee_id: employee.id,
         attendance_date: today,
         clock_in_time: now.toISOString(),
-        status: employee.position?.toLowerCase().includes('part-time') ? 'Part-time Present' : 'Present',
+        status: `Present_${timestamp}`
       })
       .select()
       .single();
+
     setActionLoading(false);
     if (error) {
       toast({ title: 'Clock In Failed', description: error.message, variant: 'destructive' });
     } else if (data) {
       toast({ title: 'Clocked In', description: `Welcome, ${employee.name}!` });
       setAttendanceRecords(prev => [data, ...prev]);
-      setCurrentStatus({ status: 'Clocked In', recordId: data.id });
+      setCurrentStatus({ 
+        status: 'Clocked In', 
+        recordId: data.id,
+        clockInTime: data.clock_in_time
+      });
     }
   };
 
   const handleClockOut = async () => {
-    if (!employee || !currentStatus.recordId) return;
+    if (!employee) return;
     setActionLoading(true);
     const now = new Date();
+
+    // Find the latest clock-in record without a clock-out time
+    const today = format(now, 'yyyy-MM-dd');
+    const latestOpenRecord = attendanceRecords.find(r => 
+      format(parseISO(r.attendance_date), 'yyyy-MM-dd') === today && 
+      r.clock_in_time && 
+      !r.clock_out_time
+    );
+
+    if (!latestOpenRecord) {
+      setActionLoading(false);
+      toast({ title: 'Clock Out Failed', description: 'No active clock-in record found.', variant: 'destructive' });
+      return;
+    }
 
     const { data, error } = await supabase
       .from('employee_attendance')
       .update({ clock_out_time: now.toISOString() })
-      .eq('id', currentStatus.recordId)
+      .eq('id', latestOpenRecord.id)
       .select()
       .single();
+
     setActionLoading(false);
     if (error) {
       toast({ title: 'Clock Out Failed', description: error.message, variant: 'destructive' });
     } else if (data) {
       toast({ title: 'Clocked Out', description: `Goodbye, ${employee.name}!` });
       setAttendanceRecords(prev => prev.map(r => r.id === data.id ? data : r));
-      setCurrentStatus({ status: 'Clocked Out', recordId: null });
+      setCurrentStatus({ 
+        status: 'Clocked Out', 
+        recordId: null,
+        clockInTime: null
+      });
     }
   };
 
