@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import AttendanceStatus from '@/components/attendance/AttendanceStatus';
 import AttendanceControls from '@/components/attendance/AttendanceControls';
 import AttendanceHistoryList from '@/components/attendance/AttendanceHistoryList';
-import LeaveManagement from '@/components/attendance/LeaveManagement';
 import { useEmployeeAttendance } from '@/hooks/useEmployeeAttendance';
 
 const EmployeeAttendancePage = ({ onLogout }) => {
@@ -147,15 +146,6 @@ const EmployeeAttendancePage = ({ onLogout }) => {
             </Button>
           </CardFooter>
         </Card>
-
-        {/* Leave Management Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <LeaveManagement employee={employee} />
-        </motion.div>
       </motion.div>
     </div>
   );

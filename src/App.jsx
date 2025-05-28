@@ -7,7 +7,6 @@ import Header from "@/components/Header";
 import EmployeeList from "@/components/EmployeeList";
 import LoginForm from "@/components/LoginForm";
 import EmployeeAttendancePage from "@/pages/EmployeeAttendancePage";
-import LeaveRequestsList from "@/components/LeaveRequestsList";
 import { supabase } from "@/lib/supabaseClient";
 import { Loader2, Power, Users, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,22 +114,10 @@ const AdminLayout = ({ onLogout }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-7"
+              className="lg:col-span-12"
             >
               <div className="bg-card rounded-xl shadow-lg border border-border/10 p-6">
                 <EmployeeList employees={employees} />
-              </div>
-            </motion.div>
-
-            {/* Leave Requests Section */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="lg:col-span-5"
-            >
-              <div className="bg-card rounded-xl shadow-lg border border-border/10 p-6 h-full">
-                <LeaveRequestsList />
               </div>
             </motion.div>
           </div>
